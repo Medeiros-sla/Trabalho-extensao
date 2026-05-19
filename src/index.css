@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  
+  --color-primary: #1E88E5;
+  --color-primary-dark: #1565C0;
+  --color-sidebar-start: #1565C0;
+  --color-sidebar-end: #0D47A1;
+  --color-bg-base: #F5F5F5;
+  --color-text-main: #212121;
+  --color-danger: #EF5350;
+
+  --shadow-card: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+@utility sidebar-gradient {
+  background: linear-gradient(180deg, var(--color-sidebar-start) 0%, var(--color-sidebar-end) 100%);
+}
