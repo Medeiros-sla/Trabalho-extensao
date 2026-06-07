@@ -1,20 +1,94 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
 
+:root {
+  --color-primary: #F59E0B; /* Warm Amber for Pet Shop */
+  --color-primary-dark: #D97706;
+  --color-sidebar-start: #1E293B;
+  --color-sidebar-end: #0F172A;
+  --color-bg-base: #F8FAFC;
+  --color-text-main: #1E293B;
+  --color-bg-card: #FFFFFF;
+  --color-border-main: #E2E8F0;
+  
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+  --color-bg-base: #0F172A;
+  --color-text-main: #F1F5F9;
+  --color-bg-card: #1E293B;
+  --color-border-main: #334155;
+}
+
 @theme {
   --font-sans: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
   
-  --color-primary: #1E88E5;
-  --color-primary-dark: #1565C0;
-  --color-sidebar-start: #1565C0;
-  --color-sidebar-end: #0D47A1;
-  --color-bg-base: #F5F5F5;
-  --color-text-main: #212121;
+  --color-primary: var(--color-primary);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-sidebar-start: var(--color-sidebar-start);
+  --color-sidebar-end: var(--color-sidebar-end);
+  --color-bg-base: var(--color-bg-base);
+  --color-text-main: var(--color-text-main);
   --color-danger: #EF5350;
 
-  --shadow-card: 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-card: var(--shadow-card);
 }
 
 @utility sidebar-gradient {
   background: linear-gradient(180deg, var(--color-sidebar-start) 0%, var(--color-sidebar-end) 100%);
+}
+
+/* Global Dark Mode Class Overrides (Seamless, non-breaking design persistence) */
+.dark body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-main);
+}
+
+/* Override standard utility behaviors inside .dark container */
+.dark .bg-white {
+  background-color: var(--color-bg-card) !important;
+}
+
+.dark .border-gray-100, 
+.dark .border-gray-200, 
+.dark .border-slate-100 {
+  border-color: var(--color-border-main) !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #121B2E !important; /* Slightly darker slate */
+}
+
+.dark .bg-gray-100 {
+  background-color: #334155 !important;
+}
+
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-text-main {
+  color: var(--color-text-main) !important;
+}
+
+.dark .text-gray-700,
+.dark .text-gray-600 {
+  color: #CBD5E1 !important;
+}
+
+.dark .text-gray-500,
+.dark .text-gray-400 {
+  color: #94A3B8 !important;
+}
+
+.dark input:not([type="checkbox"]),
+.dark select,
+.dark textarea {
+  background-color: #1E293B !important;
+  color: #F1F5F9 !important;
+  border-color: #475569 !important;
+}
+
+.dark input:disabled {
+  background-color: #0F172A !important;
+  color: #64748B !important;
 }

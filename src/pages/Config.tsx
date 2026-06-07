@@ -5,8 +5,20 @@ import { motion } from "motion/react";
 
 export const Config: React.FC = () => {
   const { profile } = useAuth();
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("theme") === "dark");
   const [notifications, setNotifications] = useState(true);
+
+  const toggleDarkMode = () => {
+    const nextDark = !darkMode;
+    setDarkMode(nextDark);
+    if (nextDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -90,7 +102,7 @@ export const Config: React.FC = () => {
                   </div>
                 </div>
                 <button 
-                  onClick={() => setDarkMode(!darkMode)}
+                  onClick={toggleDarkMode}
                   className={`w-10 h-5 rounded-full transition-colors relative ${darkMode ? "bg-primary" : "bg-gray-200"}`}
                 >
                   <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${darkMode ? "left-5.5" : "left-0.5"}`} />
@@ -117,7 +129,7 @@ export const Config: React.FC = () => {
             </div>
           </section>
 
-          <div className="p-6 rounded-xl sidebar-gradient text-white space-y-4 shadow-card">
+          <div className="hidden p-6 rounded-xl sidebar-gradient text-white space-y-4 shadow-card">
             <div className="flex items-center gap-3">
                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                 <Settings size={24} />

@@ -1,74 +1,266 @@
 import React, { useEffect, useState } from "react";
-import { collection, onSnapshot, query, addDoc, updateDoc, deleteDoc, doc, where, getDocs, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, query, addDoc, updateDoc, doc, getDocs, where, orderBy } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import { Users, Plus, Search, Mail, Phone, MapPin, X, History, ShoppingBag } from "lucide-react";
+import { Users, Plus, Search, Phone, MapPin, X, History, ShoppingBag, Download, Edit, Trash2, Heart, PawPrint, MessageSquare, ClipboardList } from "lucide-react";
 import { formatCurrency, OperationType, handleFirestoreError } from "../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
+
+interface Pet {
+  name: string;
+  species: string;
+  breed: string;
+  birthDate: string;
+  notes?: string;
+}
 
 interface Client {
   id: string;
   name: string;
-  email: string;
   phone: string;
+  whatsapp: string;
+  cpf?: string;
   address: string;
+  notes?: string;
+  pets?: Pet[];
 }
 
 export const Clients: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientSales, setClientSales] = useState<any[]>([]);
-  const [formData, setFormData] = useState<Partial<Client>>({ name: "", email: "", phone: "", address: "" });
+  const [formData, setFormData] = useState<Partial<Client>>({
+    name: "",
+    phone: "",
+    whatsapp: "",
+    cpf: "",
+    address: "",
+    notes: "",
+    pets: []
+  });
+
+  // Pet nested creation inside selected client
+  const [showAddPetForm, setShowAddPetForm] = useState(false);
+  const [petFormData, setPetFormData] = useState<Pet>({
+    name: "",
+    species: "Cachorro",
+    breed: "",
+    birthDate: "",
+    notes: ""
+  });
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, "clients")), (snap) => {
       setClients(snap.docs.map(d => ({ id: d.id, ...d.data() } as Client)));
+    }, (err) => {
+      handleFirestoreError(err, OperationType.LIST, "clients");
     });
     return () => unsub();
   }, []);
 
   const handleOpenDetails = async (client: Client) => {
     setSelectedClient(client);
-    const q = query(collection(db, "sales"), where("clientId", "==", client.id), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
-    setClientSales(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    setIsEditMode(false);
+    setShowAddPetForm(false);
+    try {
+      const q = query(collection(db, "sales"), where("clientId", "==", client.id), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      setClientSales(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.LIST, "sales");
+    }
     setIsModalOpen(true);
+  };
+
+  const handleOpenCreate = () => {
+    setSelectedClient(null);
+    setIsEditMode(true);
+    setShowAddPetForm(false);
+    setFormData({
+      name: "",
+      phone: "",
+      whatsapp: "",
+      cpf: "",
+      address: "",
+      notes: "",
+      pets: []
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (client: Client, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedClient(client);
+    setIsEditMode(true);
+    setShowAddPetForm(false);
+    setFormData({
+      name: client.name,
+      phone: client.phone,
+      whatsapp: client.whatsapp,
+      cpf: client.cpf || "",
+      address: client.address,
+      notes: client.notes || "",
+      pets: client.pets || []
+    });
+    setIsModalOpen(true);
+  };
+
+  const formatPhone = (val: string) => {
+    const clean = val.replace(/\D/g, "");
+    if (clean.length <= 10) {
+      return clean.replace(/^(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").trim();
+    }
+    return clean.substring(0, 11).replace(/^(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim();
+  };
+
+  const formatCPF = (val: string) => {
+    const clean = val.replace(/\D/g, "");
+    return clean
+      .substring(0, 11)
+      .replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})/, (_, p1, p2, p3, p4) => {
+        let res = p1;
+        if (p2) res += `.${p2}`;
+        if (p3) res += `.${p3}`;
+        if (p4) res += `-${p4}`;
+        return res;
+      });
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: "phone" | "whatsapp") => {
+    setFormData({ ...formData, [field]: formatPhone(e.target.value) });
+  };
+
+  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, cpf: formatCPF(e.target.value) });
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (selectedClient && !isModalOpen) {
-          // logic for update when we add edit button later
+      if (selectedClient) {
+        // Update client details
+        await updateDoc(doc(db, "clients", selectedClient.id), {
+          name: formData.name,
+          phone: formData.phone,
+          whatsapp: formData.whatsapp,
+          cpf: formData.cpf || "",
+          address: formData.address,
+          notes: formData.notes || "",
+          updatedAt: new Date()
+        });
       } else {
-          await addDoc(collection(db, "clients"), { ...formData, createdAt: new Date() });
+        // Create client profile
+        await addDoc(collection(db, "clients"), {
+          name: formData.name,
+          phone: formData.phone,
+          whatsapp: formData.whatsapp,
+          cpf: formData.cpf || "",
+          address: formData.address,
+          notes: formData.notes || "",
+          pets: [],
+          createdAt: new Date()
+        });
       }
       setIsModalOpen(false);
-      setFormData({ name: "", email: "", phone: "", address: "" });
+      setIsEditMode(false);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, "clients");
     }
   };
 
-  const filtered = clients.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const handleAddPet = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedClient) return;
+    try {
+      const updatedPets = [
+        ...(selectedClient.pets || []),
+        { ...petFormData }
+      ];
+      await updateDoc(doc(db, "clients", selectedClient.id), {
+        pets: updatedPets
+      });
+      setSelectedClient({ ...selectedClient, pets: updatedPets });
+      setShowAddPetForm(false);
+      setPetFormData({ name: "", species: "Cachorro", breed: "", birthDate: "", notes: "" });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, `clients/${selectedClient.id}`);
+    }
+  };
+
+  const handleRemovePet = async (index: number) => {
+    if (!selectedClient) return;
+    if (!window.confirm("Deseja realmente remover este pet?")) return;
+    try {
+      const updatedPets = (selectedClient.pets || []).filter((_, i) => i !== index);
+      await updateDoc(doc(db, "clients", selectedClient.id), {
+        pets: updatedPets
+      });
+      setSelectedClient({ ...selectedClient, pets: updatedPets });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, `clients/${selectedClient.id}`);
+    }
+  };
+
+  const handleSyncWhatsapp = () => {
+    setFormData(prev => ({ ...prev, whatsapp: prev.phone }));
+  };
+
+  const exportToCSV = () => {
+    const headers = ["Nome", "Telefone", "WhatsApp", "CPF", "Endereço", "Observações", "Total de Pets"];
+    const rows = clients.map(c => [
+      c.name || "",
+      c.phone || "",
+      c.whatsapp || "",
+      c.cpf || "",
+      c.address || "",
+      c.notes || "",
+      c.pets ? c.pets.length : 0
+    ]);
+    
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
+      + [headers.join(";"), ...rows.map(e => e.map(val => `"${val.toString().replace(/"/g, '""')}"`).join(";"))].join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Clientes_PetShop_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const filtered = clients.filter(c => 
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.phone.includes(searchTerm) ||
+    (c.cpf && c.cpf.includes(searchTerm))
+  );
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-text-main">Gestão de Clientes</h2>
-          <p className="text-sm text-gray-500">Relacionamento e histórico completo de compras</p>
+          <h2 className="text-2xl font-bold text-text-main">Clientes & Pets</h2>
+          <p className="text-sm text-gray-500">Gestão de tutores, animais cadastrados e histórico de visitas</p>
         </div>
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <input
-            type="text"
-            placeholder="Pesquisar cliente..."
-            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none shadow-card text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+          <button 
+            onClick={exportToCSV}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all shadow-sm font-bold text-xs uppercase tracking-wider border border-gray-200"
+          >
+            <Download size={14} /> EXPORTAR CSV
+          </button>
+          <div className="relative max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Pesquisar cliente, CPF ou tel..."
+              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none shadow-card text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </header>
 
@@ -78,50 +270,73 @@ export const Clients: React.FC = () => {
             layout
             key={client.id}
             onClick={() => handleOpenDetails(client)}
-            className="bg-white p-6 rounded-xl shadow-card border border-gray-100 hover:shadow-lg transition-all cursor-pointer group relative overflow-hidden"
+            className="bg-white p-6 rounded-xl shadow-card border border-gray-100 hover:border-yellow-200 hover:shadow-lg transition-all cursor-pointer group relative overflow-hidden"
           >
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 bg-blue-50 text-primary rounded-xl flex items-center justify-center font-bold text-xl border border-blue-100 shadow-sm">
+              <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold text-xl border border-amber-100 shadow-sm shrink-0">
                 {client.name?.[0]}
               </div>
-              <div className="flex-1 overflow-hidden">
-                <h4 className="font-bold text-gray-900 group-hover:text-primary transition-colors truncate">{client.name}</h4>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">{client.email}</p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <h4 className="font-bold text-gray-900 group-hover:text-primary transition-colors truncate text-base">{client.name}</h4>
+                  <button 
+                    onClick={(e) => handleOpenEdit(client, e)}
+                    className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-primary transition-colors duration-150"
+                  >
+                    <Edit size={14} />
+                  </button>
+                </div>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">
+                  CPF: {client.cpf || "Não informado"}
+                </p>
               </div>
             </div>
             
-            <div className="mt-8 space-y-4">
-              <div className="flex items-center gap-3 text-xs text-gray-500 bg-gray-50 p-2 rounded-lg border border-gray-100">
-                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary-dark">
-                  <Phone size={14} />
+            <div className="mt-6 space-y-3">
+              <div className="flex items-center gap-3 text-xs text-gray-600 bg-gray-50 p-2 rounded-lg border border-gray-100">
+                <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-primary-dark shadow-sm">
+                  <Phone size={13} />
                 </div>
-                <span className="font-medium">{client.phone}</span>
+                <span className="font-semibold">{client.phone}</span>
+                {client.whatsapp && client.whatsapp === client.phone ? (
+                  <span className="text-[9px] font-bold text-orange-500 bg-orange-50 px-2 py-0.5 rounded border border-orange-100 uppercase scale-90 tracking-wider">WhatsApp</span>
+                ) : null}
               </div>
-              <div className="flex items-center gap-3 text-xs text-gray-500 bg-gray-50 p-2 rounded-lg border border-gray-100">
-                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary-dark">
-                  <MapPin size={14} />
+
+              {/* Pets counts */}
+              <div className="flex items-center gap-3 text-xs text-gray-600 bg-gray-50 p-2 rounded-lg border border-gray-100">
+                <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-amber-600 shadow-sm">
+                  <PawPrint size={13} />
                 </div>
-                <span className="truncate font-medium">{client.address}</span>
+                <div className="flex-1 overflow-hidden">
+                  {client.pets && client.pets.length > 0 ? (
+                    <span className="font-bold text-amber-600">{client.pets.length} {client.pets.length === 1 ? "Pet" : "Pets"}: <span className="font-medium text-gray-500 text-[11px] truncate">{client.pets.map(p => p.name).join(", ")}</span></span>
+                  ) : (
+                    <span className="text-gray-400 italic">Sem pets cadastrados</span>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="mt-8 pt-4 border-t border-gray-50 flex justify-between items-center bg-gray-50/50 -mx-6 -mb-6 px-6 py-4 transition-all group-hover:bg-primary/5">
-              <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Acessar Histórico</span>
-              <History size={16} className="text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
+            <div className="mt-6 pt-4 border-t border-gray-50 flex justify-between items-center bg-gray-50/50 -mx-6 -mb-6 px-6 py-4 transition-all group-hover:bg-primary/5">
+              <span className="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center gap-1">
+                <Heart size={10} /> Perfil & Histórico
+              </span>
+              <History size={15} className="text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
             </div>
           </motion.div>
         ))}
       </div>
 
-       {/* FAB */}
+       {/* Floating Action Button */}
        <button
-        onClick={() => { setSelectedClient(null); setIsModalOpen(true); }}
+        onClick={handleOpenCreate}
         className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-primary-dark hover:scale-110 transition-all active:scale-95 z-30"
       >
         <Plus size={32} />
       </button>
 
-      {/* Details/Registration Modal */}
+      {/* Profile/Registration Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -130,15 +345,15 @@ export const Clients: React.FC = () => {
               initial={{ scale: 0.95, opacity: 0, y: 32 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 32 }}
-              className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]"
+              className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]"
             >
-               <div className="sidebar-gradient p-5 text-white flex justify-between items-center">
+               <div className="sidebar-gradient p-5 text-white flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                     <Users size={18} />
                   </div>
                   <h3 className="font-bold uppercase tracking-tight">
-                    {selectedClient ? "Perfil do Cliente" : "Novo Cliente"}
+                    {isEditMode ? (selectedClient ? "Editar Cliente" : "Cadastrar Cliente") : "Perfil do Cliente / Pets"}
                   </h3>
                 </div>
                 <button onClick={() => setIsModalOpen(false)} className="hover:bg-white/20 p-2 rounded-full transition-colors">
@@ -146,84 +361,316 @@ export const Clients: React.FC = () => {
                 </button>
               </div>
 
-              {selectedClient ? (
-                <div className="p-8 overflow-y-auto space-y-8 custom-scrollbar">
-                  <div className="flex flex-col md:flex-row gap-8">
-                    <div className="w-24 h-24 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-center text-3xl font-bold text-primary shadow-sm shrink-0">
-                      {selectedClient.name?.[0]}
+              <div className="p-8 overflow-y-auto space-y-8 custom-scrollbar">
+                {isEditMode ? (
+                  /* Create / Edit Form */
+                  <form onSubmit={handleSave} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nome Completo do Tutor</label>
+                        <input 
+                          type="text"
+                          required 
+                          placeholder="Ex: João da Silva"
+                          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm font-medium transition-all" 
+                          value={formData.name} 
+                          onChange={e => setFormData({...formData, name: e.target.value})} 
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">CPF (Opcional)</label>
+                        <input 
+                          type="text" 
+                          placeholder="000.000.000-00"
+                          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm font-medium transition-all" 
+                          value={formData.cpf} 
+                          onChange={handleCPFChange} 
+                        />
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-4">{selectedClient.name}</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
-                        <div className="flex items-center gap-2 text-gray-500 text-xs font-medium">
-                          <Mail size={14} className="text-primary-dark" /> {selectedClient.email}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Telefone de Contato</label>
+                          <button 
+                            type="button" 
+                            onClick={handleSyncWhatsapp} 
+                            className="text-[9px] font-bold text-primary hover:underline uppercase tracking-wide"
+                          >
+                            Mesmo p/ WhatsApp →
+                          </button>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-500 text-xs font-medium">
-                          <Phone size={14} className="text-primary-dark" /> {selectedClient.phone}
+                        <input 
+                          type="tel" 
+                          required 
+                          placeholder="(00) 00000-0000"
+                          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm font-medium transition-all" 
+                          value={formData.phone} 
+                          onChange={e => handlePhoneChange(e, "phone")} 
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">WhatsApp</label>
+                        <input 
+                          type="tel" 
+                          required 
+                          placeholder="(00) 00000-0000"
+                          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm font-medium transition-all" 
+                          value={formData.whatsapp} 
+                          onChange={e => handlePhoneChange(e, "whatsapp")} 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Endereço Completo</label>
+                      <input 
+                        type="text" 
+                        required 
+                        placeholder="Rua, Número, Bairro, Cidade"
+                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm font-medium transition-all" 
+                        value={formData.address} 
+                        onChange={e => setFormData({...formData, address: e.target.value})} 
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Observações do Cliente (Opcional)</label>
+                      <textarea 
+                        rows={3} 
+                        placeholder="Ex: Prefere atendimento nos sábados de manhã..."
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm font-medium transition-all resize-none" 
+                        value={formData.notes} 
+                        onChange={e => setFormData({...formData, notes: e.target.value})} 
+                      />
+                    </div>
+
+                    <div className="pt-4 flex gap-4">
+                      <button 
+                        type="button" 
+                        onClick={() => { if (selectedClient) setIsEditMode(false); else setIsModalOpen(false); }}
+                        className="flex-1 py-3 border border-gray-200 text-gray-600 font-bold rounded-xl hover:bg-gray-50 transition-all uppercase text-xs tracking-widest"
+                      >
+                        Cancelar
+                      </button>
+                      <button 
+                        type="submit" 
+                        className="flex-1 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark shadow-lg transition-all uppercase text-xs tracking-widest"
+                      >
+                        {selectedClient ? "ATUALIZAR TUTOR" : "FINALIZAR CADASTRO"}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  /* Client Profile details with PETS manager & Transactions */
+                  selectedClient && (
+                    <div className="space-y-8">
+                      <div className="flex flex-col md:flex-row gap-8 pb-6 border-b border-gray-100">
+                        <div className="w-20 h-20 bg-amber-50 border border-amber-100 rounded-2xl flex items-center justify-center text-3xl font-bold text-amber-600 shadow-sm shrink-0">
+                          {selectedClient.name?.[0]}
                         </div>
-                        <div className="flex items-center gap-2 text-gray-500 text-xs font-medium sm:col-span-2">
-                          <MapPin size={14} className="text-primary-dark" /> {selectedClient.address}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <h3 className="text-2xl font-bold text-gray-900 leading-tight">{selectedClient.name}</h3>
+                            <button
+                              onClick={(e) => handleOpenEdit(selectedClient, e)}
+                              className="flex items-center gap-1 px-3 py-1.5 hover:bg-amber-50 border border-amber-100 text-amber-600 text-[10px] font-black tracking-widest uppercase rounded-lg transition-colors"
+                            >
+                              <Edit size={12} /> Editar Perfil
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-xs text-gray-500 font-medium">
+                            <p className="flex items-center gap-1.5"><span className="font-bold text-gray-400">CPF:</span> {selectedClient.cpf || "Não informado"}</p>
+                            <p className="flex items-center gap-1.5"><span className="font-bold text-gray-400">WhatsApp:</span> {selectedClient.whatsapp || "Não informado"}</p>
+                            <p className="flex items-center gap-1.5"><span className="font-bold text-gray-400">Telefone:</span> {selectedClient.phone}</p>
+                            <p className="flex items-center gap-1.5 sm:col-span-2"><span className="font-bold text-gray-400">Endereço:</span> {selectedClient.address}</p>
+                            {selectedClient.notes && (
+                              <p className="flex items-start gap-1.5 sm:col-span-2 bg-gray-50 p-3 rounded-lg border border-gray-100 italic mt-2"><span className="font-bold text-gray-400 not-italic shrink-0 flex items-center gap-1"><ClipboardList size={14} /> Obs do Cliente:</span> {selectedClient.notes}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* PET CORES PANEL */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                          <h4 className="font-bold text-xs uppercase tracking-widest text-amber-600 flex items-center gap-2">
+                            <PawPrint size={16} /> Animais Vinculados ({selectedClient.pets?.length || 0})
+                          </h4>
+                          {!showAddPetForm && (
+                            <button 
+                              onClick={() => setShowAddPetForm(true)}
+                              className="text-[10px] font-bold text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded-lg uppercase flex items-center gap-1 transition-colors"
+                            >
+                              <Plus size={12} /> CADASTRAR PET
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Pet Creation Inline Sub-form */}
+                        <AnimatePresence>
+                          {showAddPetForm && (
+                            <motion.form 
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              onSubmit={handleAddPet}
+                              className="p-5 bg-amber-50/50 border border-amber-100 rounded-xl space-y-4 overflow-hidden"
+                            >
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nome do Pet</label>
+                                  <input 
+                                    type="text" 
+                                    required
+                                    placeholder="Ex: Bob, Mel, Pipoca"
+                                    className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-primary"
+                                    value={petFormData.name} 
+                                    onChange={e => setPetFormData({...petFormData, name: e.target.value})} 
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Espécie</label>
+                                  <select 
+                                    className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-primary"
+                                    value={petFormData.species} 
+                                    onChange={e => setPetFormData({...petFormData, species: e.target.value})}
+                                  >
+                                    <option value="Cachorro">Cachorro</option>
+                                    <option value="Gato">Gato</option>
+                                    <option value="Pássaro">Pássaro</option>
+                                    <option value="Roedor">Roedor</option>
+                                    <option value="Réptil">Réptil</option>
+                                    <option value="Outro">Outro</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Raça do Pet</label>
+                                  <input 
+                                    type="text" 
+                                    required
+                                    placeholder="Ex: Poodle, Persa, Sete raças..."
+                                    className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-primary"
+                                    value={petFormData.breed} 
+                                    onChange={e => setPetFormData({...petFormData, breed: e.target.value})} 
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Data de Nascimento (Aprox.)</label>
+                                  <input 
+                                    type="date" 
+                                    required
+                                    className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-primary"
+                                    value={petFormData.birthDate} 
+                                    onChange={e => setPetFormData({...petFormData, birthDate: e.target.value})} 
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Particularidades / Observações Clínicas</label>
+                                <input 
+                                  type="text" 
+                                  placeholder="Ex: Tem alergia a medicamentos de látex, cardíaco, etc..."
+                                  className="w-full px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-primary"
+                                  value={petFormData.notes} 
+                                  onChange={e => setPetFormData({...petFormData, notes: e.target.value})} 
+                                />
+                              </div>
+                              <div className="flex justify-end gap-2 pt-2">
+                                <button 
+                                  type="button" 
+                                  onClick={() => setShowAddPetForm(false)} 
+                                  className="px-3 py-1.5 border border-amber-200 text-amber-700 hover:bg-amber-100 rounded-lg text-[10px] font-bold uppercase transition"
+                                >
+                                  Cancelar
+                                </button>
+                                <button 
+                                  type="submit" 
+                                  className="px-4 py-1.5 bg-amber-500 text-white hover:bg-amber-600 rounded-lg text-[10px] font-bold uppercase transition"
+                                >
+                                  GRAVAR NOVO PET
+                                </button>
+                              </div>
+                            </motion.form>
+                          )}
+                        </AnimatePresence>
+
+                        {/* Pets Rendered List */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {!selectedClient.pets || selectedClient.pets.length === 0 ? (
+                            <div className="text-center py-6 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200 sm:col-span-2">
+                              🐾 Ninguém listado. Adicione o Bob ou a Luna clicando acima!
+                            </div>
+                          ) : (
+                            selectedClient.pets.map((pet, i) => (
+                              <div key={i} className="flex flex-col p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-amber-200 relative group/pet">
+                                <button 
+                                  onClick={() => handleRemovePet(i)}
+                                  className="absolute top-3 right-3 p-1 hover:bg-red-50 text-gray-300 hover:text-danger rounded transition-colors opacity-0 group-hover/pet:opacity-100"
+                                  title="Remover pet do tutor"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
+                                    <Heart size={14} fill="currentColor" />
+                                  </div>
+                                  <div>
+                                    <h5 className="font-bold text-gray-900 text-sm">{pet.name}</h5>
+                                    <span className="text-[10px] font-bold uppercase tracking-wide text-amber-600">{pet.species} • {pet.breed}</span>
+                                  </div>
+                                </div>
+                                <p className="text-[10px] text-gray-500 mt-2 font-medium">Nasc: {new Date(pet.birthDate).toLocaleDateString('pt-BR')}</p>
+                                {pet.notes && (
+                                  <p className="text-[10px] text-gray-400 bg-amber-50/50 p-2 rounded border border-amber-50 italic mt-3 truncate" title={pet.notes}>
+                                    📌 {pet.notes}
+                                  </p>
+                                )}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Transaction details history */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                          <h4 className="font-bold text-xs uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                             <ShoppingBag size={14} className="text-primary" />
+                             Últimas Vendas
+                          </h4>
+                          <span className="text-[10px] font-bold text-primary bg-amber-50 border border-amber-100 px-3 py-1 rounded-full uppercase">{clientSales.length} Pedidos</span>
+                        </div>
+                        <div className="space-y-3">
+                          {clientSales.length === 0 ? (
+                            <div className="text-center py-6 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                              <ShoppingBag size={32} className="mx-auto mb-2 opacity-10" />
+                              <p className="text-[10px] uppercase font-bold tracking-widest">Sem vendas associadas a este tutor</p>
+                            </div>
+                          ) : (
+                            clientSales.map(sale => (
+                              <div key={sale.id} className="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-150 shadow-sm hover:shadow-md transition-all">
+                                 <div>
+                                   <p className="font-bold text-sm text-gray-900">
+                                     {sale.createdAt ? new Date(sale.createdAt.seconds * 1000).toLocaleDateString('pt-BR') : "Sem Data"}
+                                   </p>
+                                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{sale.items?.length || 0} itens comprados</p>
+                                 </div>
+                                 <div className="text-right">
+                                   <p className="font-bold text-primary text-base">{formatCurrency(sale.total)}</p>
+                                 </div>
+                              </div>
+                            ))
+                          )}
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                      <h4 className="font-bold text-xs uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                         <ShoppingBag size={14} className="text-primary" />
-                         Últimas Compras
-                      </h4>
-                      <span className="text-[10px] font-bold text-primary bg-blue-50 px-3 py-1 rounded-full uppercase">{clientSales.length} Pedidos</span>
-                    </div>
-                    <div className="space-y-4">
-                      {clientSales.length === 0 ? (
-                        <div className="text-center py-12 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                          <ShoppingBag size={48} className="mx-auto mb-2 opacity-10" />
-                          <p className="text-xs uppercase font-bold tracking-widest">Nenhuma compra registrada</p>
-                        </div>
-                      ) : (
-                        clientSales.map(sale => (
-                          <div key={sale.id} className="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
-                             <div>
-                               <p className="font-bold text-sm text-gray-900">{new Date(sale.createdAt.seconds * 1000).toLocaleDateString('pt-BR')}</p>
-                               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{sale.items.length} itens no total</p>
-                             </div>
-                             <div className="text-right">
-                               <p className="font-bold text-primary text-base">{formatCurrency(sale.total)}</p>
-                               <button className="text-[10px] text-gray-400 font-bold uppercase hover:text-primary transition-colors">Ver Detalhes</button>
-                             </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <form onSubmit={handleSave} className="p-8 space-y-6">
-                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nome Completo</label>
-                    <input required className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm font-medium" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">E-mail</label>
-                      <input type="email" className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm font-medium" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Telefone</label>
-                      <input className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm font-medium" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Endereço Completo</label>
-                    <textarea rows={3} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary resize-none text-sm font-medium" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
-                  </div>
-                  <div className="pt-4">
-                    <button type="submit" className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark shadow-lg transition-all active:scale-95 uppercase text-xs tracking-widest">SALVAR CLIENTE</button>
-                  </div>
-                </form>
-              )}
+                  )
+                )}
+              </div>
             </motion.div>
           </div>
         )}

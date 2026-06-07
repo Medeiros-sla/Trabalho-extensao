@@ -1,6 +1,6 @@
 {
   "name": "VendasPro",
-  "description": "Sistema completo de gestão de vendas e controle de estoque com interface moderna e intuitiva.",
+  "description": "Sistema completo de gestão, controle de estoque, clientes, pets e vendas para Pet Shop.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
