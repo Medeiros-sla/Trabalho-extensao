@@ -78,7 +78,9 @@ O sistema utiliza regras de segurança do Firebase Firestore para garantir que c
 Aplicação hospedada via Vercel:
 
 > https://teste-faculdade2.vercel.app/login
-
+> Usuário para teste (Admin)
+  email: admin@empresa.com
+  senha: 123456
 ---
 
 ## 📚 Objetivo do Projeto
