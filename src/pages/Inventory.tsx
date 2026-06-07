@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { collection, onSnapshot, query, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { Package, Plus, Search, Edit2, Trash2, X, Camera, AlertTriangle, Download, ShoppingBag, Store } from "lucide-react";
-import { formatCurrency, OperationType, handleFirestoreError } from "../lib/utils";
+import { formatCurrency, OperationType, handleFirestoreError, cn } from "../lib/utils";
+import { useAuth } from "../context/AuthContext";
 import { motion, AnimatePresence } from "motion/react";
 
 interface Product {
@@ -36,6 +37,9 @@ const CATEGORIES = [
 ];
 
 export const Inventory: React.FC = () => {
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === "admin";
+
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
@@ -105,6 +109,7 @@ export const Inventory: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAdmin) return;
     try {
       const cost = Number(formData.costPrice || 0);
       const sale = Number(formData.salePrice || 0);
@@ -142,6 +147,7 @@ export const Inventory: React.FC = () => {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!isAdmin) return;
     if (window.confirm("Deseja realmente excluir este produto?")) {
       try {
         await deleteDoc(doc(db, "products", id));
@@ -284,32 +290,36 @@ export const Inventory: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex gap-2 mt-4 pt-4 border-t border-gray-50 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleOpenModal(product); }}
-                  className="flex-1 flex items-center justify-center gap-2 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-[9px] tracking-wider uppercase font-black"
-                >
-                  <Edit2 size={12} /> EDITAR
-                </button>
-                <button
-                  onClick={(e) => handleDelete(product.id, e)}
-                  className="p-1.5 text-danger hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
+              {isAdmin && (
+                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-50 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleOpenModal(product); }}
+                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-[9px] tracking-wider uppercase font-black"
+                  >
+                    <Edit2 size={12} /> EDITAR
+                  </button>
+                  <button
+                    onClick={(e) => handleDelete(product.id, e)}
+                    className="p-1.5 text-danger hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              )}
             </motion.div>
           );
         })}
       </div>
 
       {/* Floating Action Button */}
-      <button
-        onClick={() => handleOpenModal()}
-        className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-primary-dark hover:scale-110 transition-all active:scale-95 z-30"
-      >
-        <Plus size={32} />
-      </button>
+      {isAdmin && (
+        <button
+          onClick={() => handleOpenModal()}
+          className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-primary-dark hover:scale-110 transition-all active:scale-95 z-30"
+        >
+          <Plus size={32} />
+        </button>
+      )}
 
       {/* Product Detail Modal */}
       <AnimatePresence>
@@ -345,7 +355,8 @@ export const Inventory: React.FC = () => {
                     <input
                       required
                       type="text"
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
+                      disabled={!isAdmin}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
@@ -355,7 +366,8 @@ export const Inventory: React.FC = () => {
                     <input
                       required
                       type="text"
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
+                      disabled={!isAdmin}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                       value={formData.code}
                       onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                     />
@@ -367,7 +379,8 @@ export const Inventory: React.FC = () => {
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Categoria do Pet Shop</label>
                     <select
                       required
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
+                      disabled={!isAdmin}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     >
@@ -381,8 +394,9 @@ export const Inventory: React.FC = () => {
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fornecedor / Fabricante</label>
                     <input
                       type="text"
+                      disabled={!isAdmin}
                       placeholder="Ex: Premier Pet, Purina, Bayer..."
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                       value={formData.supplier}
                       onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
                     />
@@ -396,7 +410,8 @@ export const Inventory: React.FC = () => {
                       required
                       type="number"
                       step="0.01"
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
+                      disabled={!isAdmin}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                       value={formData.costPrice}
                       onChange={(e) => setFormData({ ...formData, costPrice: parseFloat(e.target.value) })}
                     />
@@ -407,7 +422,8 @@ export const Inventory: React.FC = () => {
                       required
                       type="number"
                       step="0.01"
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
+                      disabled={!isAdmin}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                       value={formData.salePrice}
                       onChange={(e) => setFormData({ ...formData, salePrice: parseFloat(e.target.value) })}
                     />
@@ -420,7 +436,8 @@ export const Inventory: React.FC = () => {
                     <input
                       required
                       type="number"
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
+                      disabled={!isAdmin}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                       value={formData.stock}
                       onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) })}
                     />
@@ -430,7 +447,8 @@ export const Inventory: React.FC = () => {
                     <input
                       required
                       type="number"
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
+                      disabled={!isAdmin}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                       value={formData.minimumStock}
                       onChange={(e) => setFormData({ ...formData, minimumStock: parseInt(e.target.value) })}
                     />
@@ -441,8 +459,9 @@ export const Inventory: React.FC = () => {
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Imagem Ilustrativa (URL)</label>
                   <input
                     type="url"
+                    disabled={!isAdmin}
                     placeholder="https://..."
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                   />
@@ -452,8 +471,9 @@ export const Inventory: React.FC = () => {
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Descrição detalhada</label>
                   <textarea
                     rows={2}
+                    disabled={!isAdmin}
                     placeholder="Especificações, peso, validade, indicação por idade..."
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none resize-none text-sm font-medium"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none resize-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
@@ -463,16 +483,21 @@ export const Inventory: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 py-3 border border-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-50 transition-colors uppercase text-xs tracking-widest"
+                    className={cn(
+                      "flex-1 py-3 font-bold rounded-xl transition-colors uppercase text-xs tracking-widest",
+                      isAdmin ? "border border-gray-200 text-gray-500 hover:bg-gray-50" : "bg-primary text-white hover:bg-primary-dark"
+                    )}
                   >
-                    CANCELAR
+                    {isAdmin ? "CANCELAR" : "FECHAR"}
                   </button>
-                  <button
-                    type="submit"
-                    className="flex-1 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg uppercase text-xs tracking-widest"
-                  >
-                    SALVAR PRODUTO
-                  </button>
+                  {isAdmin && (
+                    <button
+                      type="submit"
+                      className="flex-1 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg uppercase text-xs tracking-widest"
+                    >
+                      SALVAR PRODUTO
+                    </button>
+                  )}
                 </div>
               </form>
             </motion.div>

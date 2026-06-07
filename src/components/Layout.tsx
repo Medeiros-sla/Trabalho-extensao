@@ -72,11 +72,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         <div className="p-6 mt-auto border-t border-white/10">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-full bg-blue-300 flex items-center justify-center text-xs font-bold text-primary-dark">
+            <div className="w-8 h-8 rounded-full bg-blue-300 flex items-center justify-center text-xs font-bold text-primary-dark shrink-0">
               {profile?.name?.[0] || "U"}
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="text-xs font-semibold truncate">{profile?.name || "Usuário"}</p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold truncate">{profile?.name || "Usuário"}</p>
+                <span className={cn(
+                  "px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider scale-90",
+                  profile?.role === "admin" ? "bg-amber-500/25 text-amber-200" : "bg-blue-400/25 text-blue-200"
+                )}>
+                  {profile?.role === "admin" ? "Admin" : "Vendedor"}
+                </span>
+              </div>
               <p className="text-[10px] text-white/60 truncate">{profile?.email}</p>
             </div>
           </div>

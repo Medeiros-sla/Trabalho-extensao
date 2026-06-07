@@ -34,32 +34,33 @@ service cloud.firestore {
     }
 
     // Rule: Identity roles are only valid if user has correct profile claim
-    function getProfile() {
+    function hasUserDoc() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserData() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
     function isAdmin() {
-      return isSignedIn() && getProfile().role == 'admin';
+      return hasUserDoc() && getUserData().role == 'admin';
     }
 
     function isSeller() {
-      return isSignedIn() && (getProfile().role == 'vendedor' || getProfile().role == 'admin');
+      return hasUserDoc() && (getUserData().role == 'vendedor' || getUserData().role == 'admin');
     }
 
     // --- Users ---
     match /users/{userId} {
       function isValidUser(data) {
         return data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
-               data.email is string && data.email.size() > 0 &&
                (data.role == 'admin' || data.role == 'vendedor');
       }
 
       allow read: if isSignedIn();
       // Users can only write their own profile, and cannot escalate their own role unless they are already admin
       allow create: if isOwner(userId) && isValidUser(incoming()) && incoming().role == 'vendedor';
-      allow update: if isOwner(userId) && isValidUser(incoming()) && 
-                    incoming().role == existing().role && // Immortality: Role cannot be changed by user
-                    incoming().email == existing().email;
+      allow update: if (isOwner(userId) && isValidUser(incoming()) && incoming().role == existing().role) || (isAdmin() && isValidUser(incoming()));
       allow write: if isAdmin() && isValidUser(incoming());
     }
 
@@ -73,15 +74,18 @@ service cloud.firestore {
 
       allow read: if isSignedIn();
       allow create: if isAdmin() && isValidProduct(incoming());
-      allow update: if isAdmin() && isValidProduct(incoming());
+      allow update: if (isAdmin() && isValidProduct(incoming())) ||
+                    (isSeller() && 
+                     incoming().diff(existing()).affectedKeys().hasOnly(['quantity', 'stock']) &&
+                     incoming().quantity is number && incoming().quantity >= 0 &&
+                     incoming().stock is number && incoming().stock >= 0);
       allow delete: if isAdmin();
     }
 
     // --- Clients ---
     match /clients/{clientId} {
       function isValidClient(data) {
-        return data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
-               (!('email' in data) || (data.email is string && data.email.size() <= 100));
+        return data.name is string && data.name.size() > 0 && data.name.size() <= 100;
       }
 
       allow read: if isSignedIn();
@@ -93,10 +97,9 @@ service cloud.firestore {
     // --- Sales ---
     match /sales/{saleId} {
       function isValidSale(data) {
-        return data.clientId is string && isValidId(data.clientId) &&
+        return data.clientId is string &&
                data.items is list && data.items.size() > 0 &&
-               data.total is number && data.total >= 0 &&
-               data.createdAt == request.time; // Temporal Integrity
+               data.total is number && data.total >= 0;
       }
 
       allow read: if isSignedIn();

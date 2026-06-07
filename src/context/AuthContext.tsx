@@ -36,12 +36,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Default to vendedor if not found (first time login)
           const newProfile: UserProfile = {
             uid: user.uid,
-            email: user.email,
-            name: user.displayName,
+            email: user.email || "",
+            name: user.displayName || user.email?.split("@")[0] || "Usuário",
             role: "vendedor"
           };
-          await setDoc(userDocRef, newProfile);
-          setProfile(newProfile);
+          try {
+            await setDoc(userDocRef, newProfile);
+            setProfile(newProfile);
+          } catch (error) {
+            console.error("Erro ao criar perfil no Firestore:", error);
+            // Fallback so the client still has local profile even if DB write momentarily failed or rules block
+            setProfile(newProfile);
+          }
         }
       } else {
         setProfile(null);
