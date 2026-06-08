@@ -31,11 +31,19 @@ const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }
 
 export default function App() {
   React.useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
+    const savedTheme = localStorage.getItem("theme") || "light";
     if (savedTheme === "dark") {
       document.documentElement.classList.add("dark");
-    } else {
+    } else if (savedTheme === "light") {
       document.documentElement.classList.remove("dark");
+    } else {
+      // system
+      const matchesDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (matchesDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
     }
   }, []);
 

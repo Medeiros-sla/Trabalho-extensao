@@ -196,19 +196,19 @@ export const Inventory: React.FC = () => {
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-2xl font-bold text-text-main">Controle de Estoque</h2>
-          <p className="text-sm text-gray-500">Gerência de rações, medicamentos, brinquedos e acessórios com alerta de reposição</p>
+          <p className="text-sm text-text-secondary">Gerência de rações, medicamentos, brinquedos e acessórios com alerta de reposição</p>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full lg:w-auto">
           <button 
             onClick={exportToCSV}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all shadow-sm font-bold text-xs uppercase tracking-wider border border-gray-200"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-bg-card hover:bg-bg-base text-text-main rounded-xl transition-all shadow-sm font-bold text-xs uppercase tracking-wider border border-border animate-none"
           >
-            <Download size={14} /> EXPORTAR CSV
+            <Download size={14} className="text-text-secondary" /> EXPORTAR CSV
           </button>
           
           <select
-            className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-primary shadow-sm text-gray-700"
+            className="px-3 py-2 bg-bg-card border border-border rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-primary shadow-sm text-text-main"
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
           >
@@ -219,11 +219,11 @@ export const Inventory: React.FC = () => {
           </select>
 
           <div className="relative flex-1 sm:w-64 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={17} />
             <input
               type="text"
               placeholder="Pesquisar por nome ou SKU..."
-              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none shadow-sm text-sm"
+              className="w-full pl-14 pr-4 py-2 bg-bg-card border border-border text-text-main rounded-xl focus:ring-2 focus:ring-primary outline-none shadow-sm text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -244,15 +244,15 @@ export const Inventory: React.FC = () => {
               animate={{ opacity: 1 }}
               key={product.id}
               onClick={() => handleOpenModal(product)}
-              className="bg-white rounded-xl p-4 shadow-card border border-gray-100 hover:shadow-lg transition-all relative overflow-hidden group cursor-pointer"
+              className="bg-bg-card rounded-xl p-4 shadow-card border border-border hover:shadow-lg transition-all relative overflow-hidden group cursor-pointer"
             >
               {isLowStock && (
-                <div className="absolute top-0 right-0 bg-danger text-white text-[9px] font-black px-2.5 py-1 rounded-bl-lg flex items-center gap-1 z-10 animate-pulse uppercase tracking-wider">
+                <div className="absolute top-0 right-0 bg-danger text-white text-[10px] font-black px-2.5 py-1 rounded-bl-lg flex items-center gap-1 z-10 animate-pulse uppercase tracking-wider">
                   <AlertTriangle size={10} /> REPOSIÇÃO (Min: {product.minimumStock})
                 </div>
               )}
               
-              <div className="aspect-square bg-gray-50 rounded-lg mb-4 flex items-center justify-center text-gray-300 relative overflow-hidden shrink-0 border border-gray-50">
+              <div className="aspect-square bg-bg-base rounded-lg mb-4 flex items-center justify-center text-text-muted relative overflow-hidden shrink-0 border border-border">
                 {product.imageUrl ? (
                   <img referrerPolicy="no-referrer" src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                 ) : (
@@ -265,42 +265,42 @@ export const Inventory: React.FC = () => {
 
               <div className="space-y-1">
                 <div className="flex justify-between items-start gap-2">
-                  <h4 className="font-bold text-gray-900 truncate group-hover:text-primary transition-colors text-sm" title={product.name}>{product.name}</h4>
+                  <h4 className="font-bold text-text-main truncate group-hover:text-primary transition-colors text-sm" title={product.name}>{product.name}</h4>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-extrabold text-[#F59E0B] bg-amber-50 border border-amber-150 px-2 py-0.5 rounded uppercase tracking-wider">{product.category}</span>
-                  <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest truncate max-w-[124px]">{product.code}</span>
+                  <span className="text-[10px] font-bold text-amber-800 dark:text-amber-200 bg-amber-100 dark:bg-amber-950/40 border border-amber-200/50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">{product.category}</span>
+                  <span className="text-xs font-bold text-text-muted uppercase tracking-widest truncate max-w-[124px]">{product.code}</span>
                 </div>
 
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 flex justify-between items-end mt-4">
-                  <div>
-                    <p className="text-[8px] text-gray-400 uppercase font-black tracking-wider">Preço de Venda</p>
-                    <p className="text-base font-black text-amber-600">{formatCurrency(product.salePrice)}</p>
+                <div className="bg-bg-base/60 p-3 rounded-lg border border-border flex justify-between items-end mt-4">
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-text-muted uppercase font-black tracking-wider">Preço de Venda</p>
+                    <p className="text-base font-black text-amber-600 dark:text-amber-400">{formatCurrency(product.salePrice)}</p>
                     {product.costPrice > 0 && (
-                      <p className="text-[9px] text-green-500 font-bold">Margem: {formatCurrency(markUp)}</p>
+                      <p className="text-[10px] text-green-600 dark:text-green-400 font-bold">Margem: {formatCurrency(markUp)}</p>
                     )}
                   </div>
-                  <div className="text-right">
-                    <p className="text-[8px] text-gray-400 uppercase font-black tracking-wider">Qtd</p>
-                    <p className={`text-base font-black ${isLowStock ? "text-danger" : "text-gray-700"}`}>
+                  <div className="text-right space-y-1">
+                    <p className="text-[10px] text-text-muted uppercase font-black tracking-wider">Qtd</p>
+                    <p className={`text-base font-black ${isLowStock ? "text-danger" : "text-text-main"}`}>
                       {String(product.stock).padStart(2, '0')}
                     </p>
-                    <p className="text-[8px] text-gray-400 italic">Fornec: {product.supplier}</p>
+                    <p className="text-[10px] text-text-muted italic">Fornec: {product.supplier}</p>
                   </div>
                 </div>
               </div>
 
               {isAdmin && (
-                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-50 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                <div className="flex gap-2 mt-4 pt-4 border-t border-border opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
                   <button
                     onClick={(e) => { e.stopPropagation(); handleOpenModal(product); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg text-[9px] tracking-wider uppercase font-black"
+                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-100 rounded-lg text-[10px] tracking-wider uppercase font-black"
                   >
                     <Edit2 size={12} /> EDITAR
                   </button>
                   <button
                     onClick={(e) => handleDelete(product.id, e)}
-                    className="p-1.5 text-danger hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                    className="p-1.5 text-danger hover:bg-danger/10 rounded-lg transition-colors border border-transparent hover:border-danger/20"
                   >
                     <Trash2 size={13} />
                   </button>
@@ -315,7 +315,7 @@ export const Inventory: React.FC = () => {
       {isAdmin && (
         <button
           onClick={() => handleOpenModal()}
-          className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-primary-dark hover:scale-110 transition-all active:scale-95 z-30"
+          className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-primary-hover hover:scale-110 transition-all active:scale-95 z-30"
         >
           <Plus size={32} />
         </button>
@@ -336,9 +336,9 @@ export const Inventory: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="bg-white w-full max-w-xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]"
+              className="bg-bg-card w-full max-w-xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh] text-text-main border border-border"
             >
-              <div className="sidebar-gradient p-5 text-white flex justify-between items-center">
+              <div className="bg-primary p-5 text-white flex justify-between items-center">
                 <h3 className="font-bold flex items-center gap-2 uppercase tracking-tight text-sm">
                   <Package size={18} />
                   {editingProduct ? "Editar Produto de Pet Shop" : "Novo Produto de Pet Shop"}
@@ -351,23 +351,23 @@ export const Inventory: React.FC = () => {
               <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 custom-scrollbar">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nome do Produto</label>
+                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Nome do Produto</label>
                     <input
                       required
                       type="text"
                       disabled={!isAdmin}
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                      className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Código / SKU de Barras</label>
+                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Código / SKU de Barras</label>
                     <input
                       required
                       type="text"
                       disabled={!isAdmin}
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                      className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                       value={formData.code}
                       onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                     />
@@ -376,11 +376,11 @@ export const Inventory: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Categoria do Pet Shop</label>
+                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Categoria do Pet Shop</label>
                     <select
                       required
                       disabled={!isAdmin}
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                      className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     >
@@ -391,12 +391,12 @@ export const Inventory: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fornecedor / Fabricante</label>
+                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Fornecedor / Fabricante</label>
                     <input
                       type="text"
                       disabled={!isAdmin}
                       placeholder="Ex: Premier Pet, Purina, Bayer..."
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                      className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                       value={formData.supplier}
                       onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
                     />
@@ -405,25 +405,25 @@ export const Inventory: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Preço de Custo (R$)</label>
+                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Preço de Custo (R$)</label>
                     <input
                       required
                       type="number"
                       step="0.01"
                       disabled={!isAdmin}
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                      className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                       value={formData.costPrice}
                       onChange={(e) => setFormData({ ...formData, costPrice: parseFloat(e.target.value) })}
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Preço de Venda (R$)</label>
+                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Preço de Venda (R$)</label>
                     <input
                       required
                       type="number"
                       step="0.01"
                       disabled={!isAdmin}
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                      className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                       value={formData.salePrice}
                       onChange={(e) => setFormData({ ...formData, salePrice: parseFloat(e.target.value) })}
                     />
@@ -432,23 +432,23 @@ export const Inventory: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Quantidade em Estoque</label>
+                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Quantidade em Estoque</label>
                     <input
                       required
                       type="number"
                       disabled={!isAdmin}
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                      className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                       value={formData.stock}
                       onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) })}
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Alerta de Estoque Mínimo</label>
+                    <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Alerta de Estoque Mínimo</label>
                     <input
                       required
                       type="number"
                       disabled={!isAdmin}
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                      className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                       value={formData.minimumStock}
                       onChange={(e) => setFormData({ ...formData, minimumStock: parseInt(e.target.value) })}
                     />
@@ -456,24 +456,24 @@ export const Inventory: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Imagem Ilustrativa (URL)</label>
+                  <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Imagem Ilustrativa (URL)</label>
                   <input
                     type="url"
                     disabled={!isAdmin}
                     placeholder="https://..."
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                    className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Descrição detalhada</label>
+                  <label className="text-xs font-bold text-text-muted uppercase tracking-widest">Descrição detalhada</label>
                   <textarea
                     rows={2}
                     disabled={!isAdmin}
                     placeholder="Especificações, peso, validade, indicação por idade..."
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none resize-none text-sm font-medium disabled:opacity-75 disabled:bg-gray-100"
+                    className="w-full px-4 py-2 bg-bg-base border border-border text-text-main rounded-lg focus:ring-2 focus:ring-primary outline-none resize-none text-sm font-medium disabled:opacity-75 disabled:bg-bg-elevated"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
@@ -484,8 +484,8 @@ export const Inventory: React.FC = () => {
                     type="button"
                     onClick={() => setIsModalOpen(false)}
                     className={cn(
-                      "flex-1 py-3 font-bold rounded-xl transition-colors uppercase text-xs tracking-widest",
-                      isAdmin ? "border border-gray-200 text-gray-500 hover:bg-gray-50" : "bg-primary text-white hover:bg-primary-dark"
+                      "flex-1 py-3 font-bold rounded-xl transition-colors uppercase text-[10px] tracking-widest",
+                      isAdmin ? "border border-border text-text-muted hover:bg-bg-elevated hover:text-text-main" : "bg-primary text-white hover:bg-primary-hover"
                     )}
                   >
                     {isAdmin ? "CANCELAR" : "FECHAR"}
@@ -493,7 +493,7 @@ export const Inventory: React.FC = () => {
                   {isAdmin && (
                     <button
                       type="submit"
-                      className="flex-1 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-lg uppercase text-xs tracking-widest"
+                      className="flex-1 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-hover transition-colors shadow-lg uppercase text-[10px] tracking-widest"
                     >
                       SALVAR PRODUTO
                     </button>

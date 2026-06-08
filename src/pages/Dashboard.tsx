@@ -122,11 +122,11 @@ export const Dashboard: React.FC = () => {
   }, []);
 
   const cards = [
-    { title: "Faturamento do Mês", value: formatCurrency(metrics.monthlyRevenue), icon: DollarSign, color: "border-amber-500 text-amber-600 bg-amber-50" },
-    { title: "Vendas do Dia", value: metrics.dailySalesCount, icon: ShoppingBag, color: "border-blue-500 text-blue-600 bg-blue-50" },
-    { title: "Estoque em Alerta", value: metrics.lowStockCount, icon: AlertTriangle, color: "border-red-500 text-red-600 bg-red-50" },
-    { title: "Clientes / Tutores", value: metrics.totalClients, icon: Users, color: "border-purple-500 text-purple-600 bg-purple-50" },
-    { title: "Produtos no Catálogo", value: metrics.totalProducts, icon: Package, color: "border-teal-500 text-teal-600 bg-teal-50" }
+    { title: "Faturamento do Mês", value: formatCurrency(metrics.monthlyRevenue), icon: DollarSign, color: "border-amber-500 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/35" },
+    { title: "Vendas do Dia", value: metrics.dailySalesCount, icon: ShoppingBag, color: "border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/35" },
+    { title: "Estoque em Alerta", value: metrics.lowStockCount, icon: AlertTriangle, color: "border-red-500 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/35" },
+    { title: "Clientes / Tutores", value: metrics.totalClients, icon: Users, color: "border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/35" },
+    { title: "Produtos no Catálogo", value: metrics.totalProducts, icon: Package, color: "border-teal-500 text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/35" }
   ];
 
   if (loading) {
@@ -135,14 +135,12 @@ export const Dashboard: React.FC = () => {
         <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
-  }
-
-  return (
+  }  return (
     <div className="space-y-6 pb-20 md:pb-8">
       <header className="flex justify-between items-end mb-8">
         <div>
           <h2 className="text-2xl font-bold text-text-main">Dashboard Operacional</h2>
-          <p className="text-sm text-gray-500 font-medium">Indicadores financeiros e operacionais do seu Pet Shop em tempo real</p>
+          <p className="text-sm text-text-secondary font-medium">Indicadores financeiros e operacionais do seu Pet Shop em tempo real</p>
         </div>
       </header>
 
@@ -154,17 +152,17 @@ export const Dashboard: React.FC = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className={`bg-white p-5 rounded-xl shadow-card border-l-4 border-solid border-l-amber-500 flex flex-col justify-between`}
+            className="bg-bg-card p-5 rounded-xl shadow-card border border-border border-l-4 border-l-amber-500 flex flex-col justify-between"
             style={{ borderLeftColor: card.color.split(" ")[0].replace("border-", "") }}
           >
             <div className="flex justify-between items-start mb-4">
-              <span className="text-[9px] uppercase font-black text-gray-400 tracking-wider leading-tight">{card.title}</span>
+              <span className="text-xs uppercase font-extrabold text-text-muted tracking-wider leading-tight">{card.title}</span>
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${card.color.split(" ").slice(1).join(" ")} shrink-0`}>
                 <card.icon size={16} />
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-black text-gray-900 tracking-tight">{card.value}</h3>
+              <h3 className="text-xl font-black text-text-main tracking-tight">{card.value}</h3>
             </div>
           </motion.div>
         ))}
@@ -172,10 +170,10 @@ export const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Top Product Ranking chart widget */}
-        <div className="bg-white p-6 rounded-xl shadow-card border border-gray-100 lg:col-span-7 flex flex-col">
+        <div className="bg-bg-card p-6 rounded-xl shadow-card border border-border lg:col-span-7 flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h4 className="font-bold text-[#1F2937] flex items-center gap-2 text-sm uppercase tracking-tight">
-              <Award size={18} className="text-amber-500" />
+            <h4 className="font-bold text-text-main flex items-center gap-2 text-sm uppercase tracking-tight">
+              <Award size={18} className="text-primary" />
               Ranking de Campeões de Venda
             </h4>
           </div>
@@ -189,12 +187,20 @@ export const Dashboard: React.FC = () => {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topProductsRanking}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "#9CA3AF", fontWeight: "bold" }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: "#9CA3AF" }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" opacity={0.5} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "var(--color-text-secondary)", fontWeight: "bold" }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "var(--color-text-secondary)", fontWeight: "bold" }} />
                   <Tooltip 
-                    cursor={{ fill: 'rgba(239, 68, 68, 0.02)' }}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', fontSize: '11px', fontWeight: 'bold' }}
+                    cursor={{ fill: 'rgba(217, 119, 6, 0.04)' }}
+                    contentStyle={{ 
+                      borderRadius: '12px', 
+                      border: '1px solid var(--color-border)', 
+                      backgroundColor: 'var(--color-bg-card)', 
+                      color: 'var(--color-text-main)',
+                      boxShadow: 'var(--shadow-md)', 
+                      fontSize: '11px', 
+                      fontWeight: 'bold' 
+                    }}
                    />
                   <Bar dataKey="qtySold" radius={[6, 6, 0, 0]} label={{ position: 'top', fontSize: 10, fontWeight: 'bold', fill: '#D97706' }}>
                     {topProductsRanking.map((entry, index) => (
@@ -208,13 +214,13 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Low Stock alerting listing widget */}
-        <div className="bg-white p-6 rounded-xl shadow-card border border-gray-100 lg:col-span-5 flex flex-col self-stretch">
-          <div className="flex justify-between items-center mb-6 border-b border-gray-50 pb-3">
-            <h4 className="font-bold text-[#1F2937] flex items-center gap-2 text-sm uppercase tracking-tight">
+        <div className="bg-bg-card p-6 rounded-xl shadow-card border border-border lg:col-span-5 flex flex-col self-stretch">
+          <div className="flex justify-between items-center mb-6 border-b border-border pb-3">
+            <h4 className="font-bold text-text-main flex items-center gap-2 text-sm uppercase tracking-tight">
               <AlertTriangle size={17} className="text-danger" />
               Ruptura de Estoque / Alertas
             </h4>
-            <span className="text-[10px] font-black uppercase text-red-600 bg-red-50 border border-red-100 px-2.5 py-1 rounded-full">{metrics.lowStockCount} alertas</span>
+            <span className="text-xs font-black uppercase text-danger bg-danger/10 border border-danger/20 px-2.5 py-1 rounded-full">{metrics.lowStockCount} alertas</span>
           </div>
 
           <div className="space-y-3 flex-1 overflow-y-auto max-h-[220px] custom-scrollbar">
@@ -225,29 +231,29 @@ export const Dashboard: React.FC = () => {
               </div>
             ) : (
               lowStockProducts.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3.5 bg-red-50/50 rounded-xl border border-red-100 transition-colors">
+                <div key={item.id} className="flex items-center justify-between p-3.5 bg-danger/5 rounded-xl border border-danger/10 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 bg-white rounded-lg flex flex-col items-center justify-center font-black text-red-600 border border-red-150 shadow-sm shrink-0">
+                    <div className="w-10 h-10 bg-bg-card rounded-lg flex flex-col items-center justify-center font-black text-danger border border-danger/20 shadow-sm shrink-0">
                       <span className="text-xs leading-none">{item.stock}</span>
-                      <span className="text-[7px] text-gray-400 font-bold uppercase tracking-tight">Qtd</span>
+                      <span className="text-xs text-text-muted font-bold uppercase tracking-tight">Qtd</span>
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold text-xs text-gray-900 truncate" title={item.name}>{item.name}</p>
-                      <p className="text-[9px] text-gray-400 uppercase font-bold">Categoria: {item.category}</p>
+                      <p className="font-bold text-xs text-text-main truncate" title={item.name}>{item.name}</p>
+                      <p className="text-xs text-text-secondary uppercase font-bold">Categoria: {item.category}</p>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 bg-red-100 text-red-600 text-[8px] font-extrabold rounded uppercase tracking-wider shrink-0">Reposição</span>
+                  <span className="px-2.5 py-1 bg-danger/10 text-danger text-xs font-extrabold rounded uppercase tracking-wider shrink-0">Reposição</span>
                 </div>
               ))
             )}
           </div>
 
-          <div className="mt-6 pt-4 border-t border-gray-50 shrink-0">
-            <div className="bg-blue-50 p-3.5 rounded-lg border border-blue-150 flex items-start gap-2.5">
-              <Lightbulb size={24} className="text-blue-500 shrink-0 mt-0.5" />
+          <div className="mt-6 pt-4 border-t border-border shrink-0">
+            <div className="bg-primary/5 p-3.5 rounded-lg border border-primary/20 flex items-start gap-2.5">
+              <Lightbulb size={24} className="text-primary shrink-0 mt-0.5" />
               <div>
-                <p className="text-[9px] text-blue-600 font-extrabold uppercase tracking-wider mb-0.5">Dica Operacional de Vendas</p>
-                <p className="text-[11px] text-blue-800 leading-snug font-medium">O estoque de rações e petiscos costuma ter maior saída nos finais de semana. Verifique o abastecimento toda sexta-feira pela manhã!</p>
+                <p className="text-xs text-primary font-extrabold uppercase tracking-wider mb-0.5">Dica Operacional de Vendas</p>
+                <p className="text-xs text-text-secondary leading-snug font-medium">O estoque de rações e petiscos costuma ter maior saída nos finais de semana. Verifique o abastecimento toda sexta-feira pela manhã!</p>
               </div>
             </div>
           </div>

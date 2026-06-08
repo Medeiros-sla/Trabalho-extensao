@@ -1,94 +1,127 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  --color-primary: #F59E0B; /* Warm Amber for Pet Shop */
-  --color-primary-dark: #D97706;
-  --color-sidebar-start: #1E293B;
-  --color-sidebar-end: #0F172A;
-  --color-bg-base: #F8FAFC;
-  --color-text-main: #1E293B;
-  --color-bg-card: #FFFFFF;
-  --color-border-main: #E2E8F0;
+  --color-primary: #F59E0B; /* Primary Brand: Warm Amber */
+  --color-primary-hover: #D97706; /* Hover of primary */
+  --color-primary-dark: #B45309; /* Deep/active state */
   
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --color-bg-base: #F8FAFC; /* Premium soft off-white canvas */
+  --color-bg-card: #FFFFFF; /* Pure crisp white card background */
+  --color-bg-elevated: #F1F5F9; /* Shaded secondary fields */
+  
+  --color-text-main: #0F172A; /* High contrast dark slate for main titles & body */
+  --color-text-secondary: #475569; /* Soft secondary gray for subtitles and details */
+  --color-text-muted: #94A3B8; /* Muted gray for small metadata or labels */
+  
+  --color-border: #E2E8F0; /* Soft crisp gray borders */
+  --color-border-hover: #CBD5E1; /* Borders when hovered */
+  
+  --color-success: #10B981; /* Rich success green */
+  --color-warning: #F59E0B; /* Alert yellow */
+  --color-danger: #EF4444; /* Alert red */
+
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -4px rgba(15, 23, 42, 0.1);
+  --shadow-card: 0 4px 10px -1px rgba(15, 23, 42, 0.04), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
 }
 
 .dark {
-  --color-bg-base: #0F172A;
-  --color-text-main: #F1F5F9;
-  --color-bg-card: #1E293B;
-  --color-border-main: #334155;
+  --color-primary: #FBBF24; /* Brighter warmth for dark mode visibility */
+  --color-primary-hover: #F59E0B;
+  --color-primary-dark: #D97706;
+  
+  --color-bg-base: #0F172A; /* Slate-900 base canvas */
+  --color-bg-card: #1E293B; /* Slate-800 card background */
+  --color-bg-elevated: #334155; /* Slate-700 searchbox / dropdowns / popovers background */
+  
+  --color-text-main: #F8FAFC; /* Slate-50 bright text */
+  --color-text-secondary: #CBD5E1; /* Slate-300 secondary text */
+  --color-text-muted: #64748B; /* slate-500 muted text */
+  
+  --color-border: #334155; /* Slate-700 borders */
+  --color-border-hover: #475569; /* Slate-600 border hover state */
+  
+  --color-success: #34D399; /* Green-400 */
+  --color-warning: #FBBF24; /* Amber-400 */
+  --color-danger: #F87171; /* Red-400 */
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.45);
 }
 
 @theme {
   --font-sans: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
   
   --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
   --color-primary-dark: var(--color-primary-dark);
-  --color-sidebar-start: var(--color-sidebar-start);
-  --color-sidebar-end: var(--color-sidebar-end);
+  
   --color-bg-base: var(--color-bg-base);
+  --color-bg-card: var(--color-bg-card);
+  --color-bg-elevated: var(--color-bg-elevated);
+  
   --color-text-main: var(--color-text-main);
-  --color-danger: #EF5350;
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  
+  --color-border: var(--color-border);
+  --color-border-hover: var(--color-border-hover);
+  
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
 
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
   --shadow-card: var(--shadow-card);
 }
 
 @utility sidebar-gradient {
-  background: linear-gradient(180deg, var(--color-sidebar-start) 0%, var(--color-sidebar-end) 100%);
+  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
 }
 
-/* Global Dark Mode Class Overrides (Seamless, non-breaking design persistence) */
-.dark body {
+/* Global Elements Adaptations */
+body {
   background-color: var(--color-bg-base);
   color: var(--color-text-main);
+  font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Override standard utility behaviors inside .dark container */
-.dark .bg-white {
-  background-color: var(--color-bg-card) !important;
+/* Smooth custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
 }
 
-.dark .border-gray-100, 
-.dark .border-gray-200, 
-.dark .border-slate-100 {
-  border-color: var(--color-border-main) !important;
+/* Smooth custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
 }
 
-.dark .bg-gray-50 {
-  background-color: #121B2E !important; /* Slightly darker slate */
-}
-
-.dark .bg-gray-100 {
-  background-color: #334155 !important;
-}
-
-.dark .text-gray-900,
-.dark .text-gray-800,
-.dark .text-text-main {
-  color: var(--color-text-main) !important;
-}
-
-.dark .text-gray-700,
-.dark .text-gray-600 {
-  color: #CBD5E1 !important;
-}
-
-.dark .text-gray-500,
-.dark .text-gray-400 {
-  color: #94A3B8 !important;
-}
-
-.dark input:not([type="checkbox"]),
-.dark select,
-.dark textarea {
-  background-color: #1E293B !important;
-  color: #F1F5F9 !important;
-  border-color: #475569 !important;
-}
-
-.dark input:disabled {
-  background-color: #0F172A !important;
-  color: #64748B !important;
-}

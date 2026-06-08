@@ -140,11 +140,11 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg-base flex items-center justify-center p-6 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-from)_0%,_transparent_50%)] from-amber-50">
+    <div className="min-h-screen bg-bg-base flex items-center justify-center p-6 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-from)_0%,_transparent_55%)] from-primary/5">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-white"
+        className="bg-bg-card w-full max-w-md rounded-2xl shadow-lg overflow-hidden border border-border"
       >
         {/* Banner */}
         <div className="sidebar-gradient p-10 text-white text-center relative overflow-hidden">
@@ -176,7 +176,7 @@ export const Login: React.FC = () => {
                 className="flex items-center gap-2 text-emerald-600 p-3 bg-emerald-50 rounded-lg border border-emerald-150"
               >
                 <CheckCircle size={16} className="shrink-0" />
-                <span className="text-[11px] font-bold uppercase">{success}</span>
+                <span className="text-xs font-bold uppercase">{success}</span>
               </motion.div>
             )}
 
@@ -188,7 +188,7 @@ export const Login: React.FC = () => {
                 className="flex items-center gap-2 text-danger p-3 bg-red-50 rounded-lg border border-red-100"
               >
                 <AlertCircle size={16} className="shrink-0" />
-                <span className="text-[11px] font-bold uppercase">{error}</span>
+                <span className="text-xs font-bold uppercase">{error}</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -207,26 +207,26 @@ export const Login: React.FC = () => {
               >
                 <form onSubmit={handleLogin} className="space-y-5">
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                     <input
                       type="email"
                       placeholder="E-mail profissional"
                       required
                       disabled={loading}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium"
+                      className="w-full pl-14 pr-4 py-3 bg-bg-base border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium text-text-main"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
 
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                     <input
                       type="password"
                       placeholder="Sua senha"
                       required
                       disabled={loading}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium"
+                      className="w-full pl-14 pr-4 py-3 bg-bg-base border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium text-text-main"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
@@ -249,7 +249,7 @@ export const Login: React.FC = () => {
                         setForgotEmail(email);
                         setView("forgot");
                       }}
-                      className="text-[11px] font-black text-gray-400 hover:text-primary transition-all uppercase tracking-wider cursor-pointer"
+                      className="text-xs font-black text-text-muted hover:text-primary transition-all uppercase tracking-wider cursor-pointer"
                     >
                       Esqueci minha senha
                     </button>
@@ -260,7 +260,7 @@ export const Login: React.FC = () => {
                         setSuccess("");
                         setView("signup");
                       }}
-                      className="text-[11px] font-black text-primary hover:text-primary-dark transition-all uppercase tracking-wider cursor-pointer"
+                      className="text-xs font-black text-primary hover:text-primary-dark transition-all uppercase tracking-wider cursor-pointer"
                     >
                       Criar Conta
                     </button>
@@ -279,52 +279,52 @@ export const Login: React.FC = () => {
               >
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                     <input
                       type="text"
                       placeholder="Nome de Usuário"
                       required
                       disabled={loading}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium"
+                      className="w-full pl-14 pr-4 py-3 bg-bg-base border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium text-text-main"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
                   </div>
 
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                     <input
                       type="email"
                       placeholder="Seu E-mail"
                       required
                       disabled={loading}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium"
+                      className="w-full pl-14 pr-4 py-3 bg-bg-base border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium text-text-main"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
 
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                     <input
                       type="password"
                       placeholder="Seu Password (mín. 6)"
                       required
                       disabled={loading}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium"
+                      className="w-full pl-14 pr-4 py-3 bg-bg-base border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium text-text-main"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
 
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                     <input
                       type="password"
                       placeholder="Confirmar Senha"
                       required
                       disabled={loading}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium"
+                      className="w-full pl-14 pr-4 py-3 bg-bg-base border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium text-text-main"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                     />
@@ -345,7 +345,7 @@ export const Login: React.FC = () => {
                       setSuccess("");
                       setView("login");
                     }}
-                    className="w-full text-center text-[10px] font-black text-gray-400 hover:text-primary uppercase tracking-widest mt-4 flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="w-full text-center text-xs font-black text-text-secondary hover:text-primary uppercase tracking-widest mt-4 flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <ArrowLeft size={14} /> VOLTAR PARA O LOGIN
                   </button>
@@ -362,18 +362,18 @@ export const Login: React.FC = () => {
                 transition={{ duration: 0.2 }}
               >
                 <form onSubmit={handleForgotPassword} className="space-y-5">
-                  <p className="text-xs text-gray-500 font-medium leading-relaxed mb-2 text-center">
+                  <p className="text-xs text-text-secondary font-medium leading-relaxed mb-2 text-center">
                     Insira o e-mail cadastrado e enviaremos um link para você redefinir sua senha com segurança.
                   </p>
 
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                     <input
                       type="email"
-                      placeholder="Insera seu e-mail"
+                      placeholder="Insira seu e-mail"
                       required
                       disabled={loading}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium"
+                      className="w-full pl-14 pr-4 py-3 bg-bg-base border border-border rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium text-text-main"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
                     />
@@ -394,7 +394,7 @@ export const Login: React.FC = () => {
                       setSuccess("");
                       setView("login");
                     }}
-                    className="w-full text-center text-[10px] font-black text-gray-400 hover:text-primary uppercase tracking-widest mt-4 flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="w-full text-center text-xs font-black text-text-secondary hover:text-primary uppercase tracking-widest mt-4 flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <ArrowLeft size={14} /> VOLTAR PARA O LOGIN
                   </button>

@@ -187,7 +187,7 @@ export const Reports: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-2xl font-bold text-text-main">Relatórios & Inteligência</h2>
-          <p className="text-sm text-gray-500 font-medium font-sans">Desempenho e comportamento do estoque do Pet Shop por período</p>
+          <p className="text-sm text-text-secondary font-medium font-sans">Desempenho e comportamento do estoque do Pet Shop por período</p>
         </div>
         <div className="flex gap-3 shrink-0">
           <button 
@@ -203,23 +203,31 @@ export const Reports: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* CHART 1: Evolução de vendas por período (Evolution over period) */}
-        <div className="bg-white p-6 rounded-xl shadow-card border border-gray-100 flex flex-col">
+        <div className="bg-bg-card p-6 rounded-xl shadow-card border border-border flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h4 className="font-bold text-gray-800 flex items-center gap-2 text-sm uppercase tracking-tight">
-              <TrendingUp size={18} className="text-amber-650" />
+            <h4 className="font-bold text-text-main flex items-center gap-2 text-sm uppercase tracking-tight">
+              <TrendingUp size={18} className="text-amber-600" />
               Evolução Diária do Faturamento (15 Dias)
             </h4>
           </div>
           <div className="h-[280px]">
             {dailyEvolutionData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-gray-400">Nenhum dado diário consolidado</div>
+              <div className="h-full flex items-center justify-center text-text-muted">Nenhum dado diário consolidado</div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={dailyEvolutionData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                  <XAxis dataKey="data" axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#6B7280', fontWeight: 'bold'}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#6B7280'}} tickFormatter={(v) => `R$ ${v}`} />
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '12px', fontWeight: 'bold' }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" opacity={0.5} />
+                  <XAxis dataKey="data" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--color-text-secondary)', fontWeight: 'bold'}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--color-text-secondary)', fontWeight: 'bold'}} tickFormatter={(v) => `R$ ${v}`} />
+                  <Tooltip contentStyle={{ 
+                    borderRadius: '12px', 
+                    border: '1px solid var(--color-border)', 
+                    backgroundColor: 'var(--color-bg-card)', 
+                    color: 'var(--color-text-main)',
+                    boxShadow: 'var(--shadow-md)', 
+                    fontSize: '12px', 
+                    fontWeight: 'bold' 
+                  }} />
                   <Line type="monotone" dataKey="faturamento" stroke="#D97706" strokeWidth={3} dot={{r: 4, fill: "#fff", stroke: "#D97706", strokeWidth: 2}} activeDot={{r: 6}} />
                 </LineChart>
               </ResponsiveContainer>
@@ -228,23 +236,31 @@ export const Reports: React.FC = () => {
         </div>
 
         {/* CHART 2: Produtos mais vendidos (Best selling products) */}
-        <div className="bg-white p-6 rounded-xl shadow-card border border-gray-100 flex flex-col">
+        <div className="bg-bg-card p-6 rounded-xl shadow-card border border-border flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h4 className="font-bold text-gray-800 flex items-center gap-2 text-sm uppercase tracking-tight">
-              <BarChart3 size={18} className="text-amber-650" />
+            <h4 className="font-bold text-text-main flex items-center gap-2 text-sm uppercase tracking-tight">
+              <BarChart3 size={18} className="text-amber-600" />
               Produtos Mais Vendidos (Volume Unid.)
             </h4>
           </div>
           <div className="h-[280px]">
             {bestSellingProductsData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-gray-400">Nenhum produto vendido em estoque</div>
+              <div className="h-full flex items-center justify-center text-text-muted">Nenhum produto vendido em estoque</div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={bestSellingProductsData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f3f4f6" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-border)" opacity={0.5} />
                   <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#4B5563', fontWeight: 'bold'}} width={90} />
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '11px', fontWeight: 'bold' }} />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--color-text-secondary)', fontWeight: 'bold'}} width={90} />
+                  <Tooltip contentStyle={{ 
+                    borderRadius: '12px', 
+                    border: '1px solid var(--color-border)', 
+                    backgroundColor: 'var(--color-bg-card)', 
+                    color: 'var(--color-text-main)',
+                    boxShadow: 'var(--shadow-md)', 
+                    fontSize: '11px', 
+                    fontWeight: 'bold' 
+                  }} />
                   <Bar dataKey="quantidade" radius={[0, 4, 4, 0]}>
                     {bestSellingProductsData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
@@ -257,23 +273,31 @@ export const Reports: React.FC = () => {
         </div>
 
         {/* CHART 3: Faturamento por mês */}
-        <div className="bg-white p-6 rounded-xl shadow-card border border-gray-100 flex flex-col">
+        <div className="bg-bg-card p-6 rounded-xl shadow-card border border-border flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h4 className="font-bold text-gray-800 flex items-center gap-2 text-sm uppercase tracking-tight">
-              <Calendar size={18} className="text-amber-650" />
+            <h4 className="font-bold text-text-main flex items-center gap-2 text-sm uppercase tracking-tight">
+              <Calendar size={18} className="text-amber-600" />
               Histórico de Faturamento por Mês
             </h4>
           </div>
           <div className="h-[280px]">
             {monthlyRevenueData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-gray-400">Sem histórico mensal de vendas</div>
+              <div className="h-full flex items-center justify-center text-text-muted">Sem histórico mensal de vendas</div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyRevenueData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                  <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#6B7280', fontWeight: 'bold'}} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9, fill: '#6B7280'}} tickFormatter={(v) => `R$${v}`} />
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '11px', fontWeight: 'bold' }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" opacity={0.5} />
+                  <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--color-text-secondary)', fontWeight: 'bold'}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--color-text-secondary)', fontWeight: 'bold'}} tickFormatter={(v) => `R$${v}`} />
+                  <Tooltip contentStyle={{ 
+                    borderRadius: '12px', 
+                    border: '1px solid var(--color-border)', 
+                    backgroundColor: 'var(--color-bg-card)', 
+                    color: 'var(--color-text-main)',
+                    boxShadow: 'var(--shadow-md)', 
+                    fontSize: '11px', 
+                    fontWeight: 'bold' 
+                  }} />
                   <Bar dataKey="faturamento" radius={[4, 4, 0, 0]} fill="#D97706">
                     {monthlyRevenueData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
@@ -286,17 +310,17 @@ export const Reports: React.FC = () => {
         </div>
 
         {/* CHART 4: Distribuição por Categoria de Pet Shop */}
-        <div className="bg-white p-6 rounded-xl shadow-card border border-gray-100 flex flex-col">
+        <div className="bg-bg-card p-6 rounded-xl shadow-card border border-border flex flex-col">
           <div className="flex justify-between items-center mb-6">
-            <h4 className="font-bold text-gray-800 flex items-center gap-2 text-sm uppercase tracking-tight">
-              <PieChartIcon size={18} className="text-amber-650" />
+            <h4 className="font-bold text-text-main flex items-center gap-2 text-sm uppercase tracking-tight">
+              <PieChartIcon size={18} className="text-amber-600" />
               Distribuição por Categoria de Pet Shop
             </h4>
           </div>
           
           <div className="flex flex-col sm:flex-row items-center justify-around gap-6 h-[280px]">
             {categoryRevenueTotals.length === 0 ? (
-              <div className="text-center text-gray-400">Nenhuma categoria registrada com saídas</div>
+              <div className="text-center text-text-muted">Nenhuma categoria registrada com saídas</div>
             ) : (
               <>
                 <div className="relative shrink-0">
@@ -311,15 +335,25 @@ export const Reports: React.FC = () => {
                         stroke="none"
                       >
                          {categoryRevenueTotals.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                        ))}
+                           <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                         ))}
                       </Pie>
-                      <Tooltip formatter={(v) => `R$ ${v}`} />
+                      <Tooltip 
+                        formatter={(v) => `R$ ${v}`} 
+                        contentStyle={{ 
+                          borderRadius: '12px', 
+                          border: '1px solid var(--color-border)', 
+                          backgroundColor: 'var(--color-bg-card)', 
+                          color: 'var(--color-text-main)',
+                          fontSize: '11px', 
+                          fontWeight: 'bold' 
+                        }} 
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-lg font-black text-gray-800">{formatCurrency(overallTotalRevenue)}</span>
-                    <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Total Geral</span>
+                    <span className="text-lg font-black text-text-main">{formatCurrency(overallTotalRevenue)}</span>
+                    <span className="text-xs font-black text-text-muted uppercase tracking-widest text-[10px]">Total Geral</span>
                   </div>
                 </div>
 
@@ -330,11 +364,11 @@ export const Reports: React.FC = () => {
                       <div key={item.name} className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }} />
-                          <span className="font-medium text-gray-650 truncate max-w-[120px]">{item.name}</span>
+                          <span className="font-medium text-text-secondary truncate max-w-[120px]">{item.name}</span>
                         </div>
                         <div className="text-right shrink-0 pl-2">
-                          <span className="font-black text-gray-800">{formatCurrency(item.value)}</span>
-                          <span className="text-[10px] text-gray-450 ml-1.5">({percentageValue})</span>
+                          <span className="font-black text-text-main">{formatCurrency(item.value)}</span>
+                          <span className="text-xs font-bold text-text-muted ml-1.5">({percentageValue})</span>
                         </div>
                       </div>
                     );
