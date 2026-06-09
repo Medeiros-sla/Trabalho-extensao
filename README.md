@@ -107,7 +107,7 @@ Cada perfil possui permissões específicas para garantir maior segurança e org
 
 Aplicação hospedada via Vercel:
 
-https://teste-faculdade2.vercel.app/login
+[https://teste-faculdade2.vercel.app]
 
 Caso deseje testar o sistema, utilize a funcionalidade de cadastro disponível na tela de login,
 ou utilize o usuário para testes<br>
