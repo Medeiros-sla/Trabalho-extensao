@@ -109,7 +109,10 @@ Aplicação hospedada via Vercel:
 
 https://teste-faculdade2.vercel.app/login
 
-Caso deseje testar o sistema, utilize a funcionalidade de cadastro disponível na tela de login.
+Caso deseje testar o sistema, utilize a funcionalidade de cadastro disponível na tela de login,
+ou utilize o usuário para testes
+Email: admin@empresa.com
+Senha: 123456
 
 ---
 
